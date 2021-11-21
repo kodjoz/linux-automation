@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+set -e
+
+# Tiny URL
+
+# Run this script after you have fully installed your distro
+# You must use systemd as your init system
+
+# check that we are root
+if [[ $EUID -ne 0 ]]; then
+  echo "Sorry, this script must be run as root"
+  exit 1
+fi
+
+# set hostname
+read -p "Enter new hostname: " newHostname
+echo "Setting hostname..."
+sed -i "s/$HOSTNAME/$newHostname/g" /etc/hosts
+sed -i "s/$HOSTNAME/$newHostname/g" /etc/hostname
+hostnamectl set-hostname $newHostname
+
+# set new machine ID
+# Systemd only, opinionated
+echo "Setting new machine ID..."
+rm /etc/machine-id
+systemd-machine-id-setup
+
+# Create new SSH Keys
+echo "Creating new SSH host keys..."
+rm -f /etc/ssh/ssh_host*key*
+ssh-keygen -t rsa -b 4096 -o -a 100 -N "" -f /etc/ssh/ssh_host_rsa_key
+ssh-keygen -t ed25519 -o -a 100 -N "" -f /etc/ssh/ssh_host_ed25519_key
+
+echo "Restarting shell to load new values..."
+sleep 5
+exec $SHELL
+
+exit 0
