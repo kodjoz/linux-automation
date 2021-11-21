@@ -2,8 +2,8 @@
 set -uo pipefail
 trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
 
-# Short link https://bit.ly/3kWAKuM
-# Download and run this script with sudo bash -c "bash <(curl -sSL https://bit.ly/3kWAKuM)"
+# Short link https://bit.ly/3CFjr7J
+# Download and run this script with sudo bash -c "bash <(curl -sSL https://bit.ly/3CFjr7J)"
 
 # Run this script after you have fully installed your distro
 # You must use systemd as your init system
