@@ -22,7 +22,7 @@ sed -i "s/$HOSTNAME/$newHostname/g" /etc/hostname
 hostnamectl set-hostname $newHostname
 
 # Change root password
-read -p "Change your password now: " newPassword
+read -sp "Change your password now: " newPassword
 echo "$USER:$newPassword" | chpasswd --root /
 echo "root:$newPassword" | chpasswd --root /
 
@@ -37,21 +37,6 @@ echo "Creating new SSH host keys..."
 rm -f /etc/ssh/ssh_host*key*
 ssh-keygen -t rsa -b 4096 -o -a 100 -N "" -f /etc/ssh/ssh_host_rsa_key
 ssh-keygen -t ed25519 -o -a 100 -N "" -f /etc/ssh/ssh_host_ed25519_key
-
-# Secure SSH configurations
-echo "Updating OpenSSH configuration"
-# sshd_config
-curl -sSLo sshd_config https://bit.ly/3oRAYEP && install -m 0644 sshd_config /etc/ssh/sshd_config
-
-# ssh_config
-curl -sSLo ssh_config https://bit.ly/3kVlu1g && install -m 0644 ssh_config /etc/ssh/ssh_config
-
-# rsync.d log destination
-echo "Adding log destination to rsyslog"
-echo "*.* @logserver:514" > /etc/rsyslog.d/100-logserver.conf
-
-echo "Restarting services with new configurations"
-systemctl enable --now rsyslog ssh
 
 echo "Restarting shell to load new values..."
 sleep 5

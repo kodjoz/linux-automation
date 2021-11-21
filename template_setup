@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+set -uo pipefail
+trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
+
+# check that we are root
+if [[ $EUID -ne 0 ]]; then
+  echo "Sorry, this script must be run as root"
+  exit 1
+fi
+
+# Secure sudo
+echo "Defaults editor=/usr/bin/rvim" >> /etc/sudoers
+echo "SUDO_EDITOR=rvim" >> /etc/environment
+
+# add virtio kernel modules
+cat <<EOF > /etc/modules-load.d/virtio.conf
+virtio
+virtio_balloon
+virtio_blk
+virtio_console
+virtio_net
+virtio_pci
+virtio_ring
+virtio_scsi
+EOF
+
+# add jitterentropy_rng kernel module
+echo "jitterentropy_rng" > /etc/modules-load.d/jitterentropy.conf
+
+# Secure SSH configurations
+echo "Updating OpenSSH configuration"
+# sshd_config
+curl -sSLo sshd_config https://bit.ly/3oRAYEP && install -m 0644 sshd_config /etc/ssh/sshd_config
+
+# ssh_config
+curl -sSLo ssh_config https://bit.ly/3kVlu1g && install -m 0644 ssh_config /etc/ssh/ssh_config
+
+# rsync.d log destination
+echo "Adding log destination to rsyslog"
+echo "*.* @logserver:514" > /etc/rsyslog.d/100-logserver.conf
+
+# Add DHCP network configuration
+cat <<EOF > /etc/systemd/network/10-wired.network
+[Match]
+Name=en*
+
+[Network]
+DHCP=ipv4
+EOF
+
+echo "Enabling services"
+systemctl enable --now rsyslog ssh systemd-networkd systemd-resolved
+
+read -p "Would you like to reboot the system now? [Y/N]: " confirm &&
+  [[ $confirm == [yY] || $confirm == [yY][eE][sS] ]] || exit 1
+
+reboot
+exit 0

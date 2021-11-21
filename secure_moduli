@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+# This script creates hard primes for the SSH Host modulus
+# WARNING: Expect this script to take an hour or more to run once it starts
+
+set -uo pipefail
+trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
+
+
+# check that we are root
+if [[ $EUID -ne 0 ]]; then
+  echo "Sorry, this script must be run as root"
+  exit 1
+fi
+
+# Delete existing moduli
+rm /etc/ssh/moduli
+
+# Create new moduli
+# Note, expect this operation to take an hour or more
+$(ssh-keygen -M generate -O bits=4096 /etc/ssh/moduli.all && ssh-keygen -M screen -f /etc/ssh/moduli.all /etc/ssh/moduli && rm /etc/ssh/moduli.all) > /dev/null 2>&1 &
