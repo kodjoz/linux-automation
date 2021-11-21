@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-set -e
+set -uo pipefail
+trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
 
 # Short link https://bit.ly/3kWAKuM
 # Download and run this script with sudo bash -c "bash <(curl -sSL https://bit.ly/3kWAKuM)"
@@ -19,6 +20,11 @@ echo "Setting hostname..."
 sed -i "s/$HOSTNAME/$newHostname/g" /etc/hosts
 sed -i "s/$HOSTNAME/$newHostname/g" /etc/hostname
 hostnamectl set-hostname $newHostname
+
+# Change root password
+read -p "Change your password now: " newPassword
+echo "$USER:$newPassword" | chpasswd --root /
+echo "root:$newPassword" | chpasswd --root /
 
 # set new machine ID
 # Systemd only, opinionated
@@ -45,8 +51,7 @@ echo "Adding log destination to rsyslog"
 echo "*.* @logserver:514" > /etc/rsyslog.d/100-logserver.conf
 
 echo "Restarting services with new configurations"
-systemctl restart rsyslogd sshd
-
+systemctl enable --now rsyslog ssh
 
 echo "Restarting shell to load new values..."
 sleep 5
