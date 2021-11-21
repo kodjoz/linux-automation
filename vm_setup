@@ -35,10 +35,10 @@ ssh-keygen -t ed25519 -o -a 100 -N "" -f /etc/ssh/ssh_host_ed25519_key
 # Secure SSH configurations
 echo "Updating OpenSSH configuration"
 # sshd_config
-curl -sSLO sshd_config https://bit.ly/3oRAYEP && install -m 0644 sshd_config /etc/ssh/sshd_config
+curl -sSLo sshd_config https://bit.ly/3oRAYEP && install -m 0644 sshd_config /etc/ssh/sshd_config
 
 # ssh_config
-curl -sSLO ssh_config https://bit.ly/3kVlu1g && install -m 0644 ssh_config /etc/ssh/ssh_config
+curl -sSLo ssh_config https://bit.ly/3kVlu1g && install -m 0644 ssh_config /etc/ssh/ssh_config
 
 # rsync.d log destination
 echo "Adding log destination to rsyslog"
