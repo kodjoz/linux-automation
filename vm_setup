@@ -15,14 +15,26 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 # set hostname
-read -p "Enter new hostname: " newHostname
+#read -p "Enter new hostname: " newHostname
+newHostname=$(dialog --stdout --inputbox "Enter Hostname" 0 0) || exit 1
+clear
+: ${hostname:?"Hostname cannot be empty}
+
 echo "Setting hostname..."
 sed -i "s/$HOSTNAME/$newHostname/g" /etc/hosts
 sed -i "s/$HOSTNAME/$newHostname/g" /etc/hostname
 hostnamectl set-hostname $newHostname
 
 # Change root password
-read -p "Change your password now: " newPassword
+#read -p "Change your password now: " newPassword
+newPassword=$(dialog --stdout --inputbox "Enter administrator password" 0 0) || exit 1
+clear 
+: ${password:?"Password cannot be empty"}
+
+newPassword2=$(dialog --stdout --passwordbox "Enter administrator password again" 0 0) || exit 1
+clear
+[[ "$newPassword" == "$newPassword2"  ]] || ( echo "Passwords did not match"; exit 1; )
+
 echo "$USER:$newPassword" | chpasswd --root /
 echo "root:$newPassword" | chpasswd --root /
 
