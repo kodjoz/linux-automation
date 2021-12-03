@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+
+set -uo pipefail
+trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
+
+# check we are root
+
+# check that we are root
+if [[ $EUID -ne 0 ]]; then
+  echo "Sorry, this script must be run as root"
+  exit 1
+fi
+
+# remove old docker versions
+apt-get remove -y --purge docker docker-engine docker.io containerd runc
+
+# Set up Docker repo
+apt-get install -y ca-certificates curl gnupg lsb-release
+
+# Add GPG key
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+
+# Install docker
+apt-get update -y
+apt-get install -y docker-ce docker-ce-cli containerd.io
+
+# Run hello-world test
+docker run hello-world
+
+# Install docker-compose
+ sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/dock
+apt-get install -y docker-ce docker-ce-cli containerd.io
+
+# Run hello-world test
+docker run hello-world
+
+# Install docker-compose
+curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+chmod +x /usr/local/bin/docker-compose
+
+# Install completions
+curl \
+    	-L https://raw.githubusercontent.com/docker/compose/1.29.2/contrib/completion/bash/docker-compose \
+	-o /usr/local/etc/bash_completion.d/docker-compose
+
+# ZSH Completions
+mkdir -p ~/.zsh/completion
+curl \
+	-L https://raw.githubusercontent.com/docker/compose/1.29.2/contrib/completion/zsh/_docker-compose \
+	-o ~/.zsh/completion/_docker-compose
+echo "fpath=(/home/$USER/.zsh/completion $fpath)" >> /home/"$USER"/.zshrc
