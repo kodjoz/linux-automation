@@ -10,7 +10,7 @@ trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
 
 source /etc/lsb-release
 
-if [ "$DISTRIB_ID" -ne "Ubuntu" ] || [ "$DISTRIB_ID" -ne "Debian" ]; then
+if [[ "$DISTRIB_ID" -ne "Ubuntu" ]] || [[ "$DISTRIB_ID" -ne "Debian" ]]; then
   echo "No action taken, this is not a Debian-based system"
   exit 1
 fi
@@ -27,7 +27,7 @@ apt-get install -y dialog
 #read -p "Enter new hostname: " newHostname
 newHostname=$(dialog --stdout --inputbox "Enter Hostname" 0 0) || exit 1
 clear
-:"${newHostname:?"Hostname cannot be empty"}"
+: ${newHostname:?"Hostname cannot be empty"}
 
 echo "Setting hostname..."
 sed -i "s/$HOSTNAME/$newHostname/g" /etc/hosts
@@ -38,7 +38,7 @@ hostnamectl set-hostname "$newHostname"
 #read -p "Change your password now: " newPassword
 newPassword=$(dialog --stdout --passwordbox "Enter administrator password" 0 0) || exit 1
 clear
-: "${newPassword:?"Password cannot be empty"}"
+: ${newPassword:?"Password cannot be empty"}
 
 newPassword2=$(dialog --stdout --passwordbox "Enter administrator password again" 0 0) || exit 1
 clear
