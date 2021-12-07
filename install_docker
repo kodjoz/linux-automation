@@ -34,7 +34,7 @@ sudo curl -sSL "https://github.com/docker/compose/releases/download/1.29.2/docke
 
 # Install completions
 if [[ $(grep "^$USER": /etc/passwd | grep -Eo ':([^:]*)$' | tr -d ':') == "/bin/bash" ]]; then
-	mkdir -p /etc/bash_completion.d/docker-compose
+	mkdir -p /etc/bash_completion.d/
 	curl -L https://raw.githubusercontent.com/docker/compose/1.29.2/contrib/completion/bash/docker-compose -o /etc/bash_completion.d/docker-compose
 fi
 
