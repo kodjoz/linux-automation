@@ -15,3 +15,11 @@ rm /etc/ssh/ssh_host*key*
 
 ssh-keygen -t ed25519 -N "" -o -a 100 -f /etc/ssh/ssh_host_ed25519_key > /dev/null 2>&1 &
 ssh-keygen -t rsa -b 4096 -N "" -o -a 100 -f /etc/ssh/ssh_host_rsa_key > /dev/null 2>&1 &
+
+# sshd_config
+curl -sSLo sshd_config https://bit.ly/3oRAYEP && install -m 0644 sshd_config /etc/ssh/sshd_config
+
+# ssh_config
+curl -sSLo ssh_config https://bit.ly/3kVlu1g && install -m 0644 ssh_config /etc/ssh/ssh_config
+
+rm ssh_config && rm sshd_config
